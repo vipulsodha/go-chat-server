@@ -6,6 +6,8 @@ import (
 	"log"
 	"sync"
 	"fmt"
+	"bufio"
+	"os"
 )
 
 var socketMap = make(map[int]*websocket.Conn)
@@ -16,10 +18,20 @@ func main()  {
 
 	http.Handle("/", websocket.Handler(handleWs))
 
+	go readMessageConsole()
+
 	log.Fatal(http.ListenAndServe(":8088", nil))
 
 }
 
+func readMessageConsole()  {
+
+	scanner := bufio.NewScanner(os.Stdin)
+	for scanner.Scan() {
+		broadCastMessageToAll(scanner.Text(), -1)
+	}
+
+}
 
 func handleWs(ws *websocket.Conn)  {
 
@@ -36,11 +48,10 @@ func handleWs(ws *websocket.Conn)  {
 
 	key := <- ch
 
-	fmt.Println(key)
 
 	go listenToWs(ws, key, &wait)
 
-	fmt.Println("New socket added success");
+	//fmt.Println("New socket added success");
 
 	wait.Wait()
 
@@ -67,7 +78,7 @@ func listenToWs(ws *websocket.Conn, key int, wait *sync.WaitGroup)  {
 
 		websocket.Message.Receive(ws, &reply)
 
-		fmt.Println("got message ", reply)
+		fmt.Println(reply)
 
 		go broadCastMessageToAll(reply, key)
 
@@ -87,5 +98,4 @@ func broadCastMessageToAll(message string, socketKey int)  {
 		}
 		websocket.Message.Send(ws, message)
 	}
-
 }
