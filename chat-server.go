@@ -24,6 +24,9 @@ func main()  {
 
 }
 
+/**
+For sending message from terminal directly
+ */
 func readMessageConsole()  {
 
 	scanner := bufio.NewScanner(os.Stdin)
@@ -33,6 +36,9 @@ func readMessageConsole()  {
 
 }
 
+/**
+Handling WS
+ */
 func handleWs(ws *websocket.Conn)  {
 
 	var m sync.Mutex;
@@ -57,6 +63,9 @@ func handleWs(ws *websocket.Conn)  {
 
 }
 
+/**
+Maintaining map for Websockets that are online
+ */
 func addSocketToMap(ws *websocket.Conn, m *sync.Mutex, ch chan int)  {
 
 	m.Lock()
@@ -69,7 +78,9 @@ func addSocketToMap(ws *websocket.Conn, m *sync.Mutex, ch chan int)  {
 
 }
 
-
+/**
+Listening to websockets for new messages
+ */
 func listenToWs(ws *websocket.Conn, key int, wait *sync.WaitGroup)  {
 
 	for  {
@@ -88,7 +99,9 @@ func listenToWs(ws *websocket.Conn, key int, wait *sync.WaitGroup)  {
 
 }
 
-
+/**
+Broadcast message to all the online sockets
+ */
 func broadCastMessageToAll(message string, socketKey int)  {
 
 	for key, ws := range socketMap {
